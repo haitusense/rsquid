@@ -1,0 +1,14 @@
+Package: rsquid
+Title: rsquid
+Version: 0.0.1
+Description:
+  Rust from R using the 'extendr-api' crate.
+License: TBD
+SystemRequirements: Rust tool chain w/ cargo, libclang/llvm-config
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Suggests:
+    rmarkdown,
+    testthat
