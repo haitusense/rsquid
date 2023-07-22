@@ -2,4 +2,6 @@
 
 export(named_pipe)
 export(memory_mapped_file)
+export(read_memory_mapped_file)
+export(write_memory_mapped_file)
 useDynLib(rsquid, .registration = TRUE)

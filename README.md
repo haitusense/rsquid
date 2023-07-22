@@ -18,6 +18,8 @@ R> install.packages("../rsquid/", repos = NULL, type = "source")
 
 ## Usage
 
+### plot
+
 ```R
 library(jsonlite)
 library(ggplot2)
@@ -71,4 +73,13 @@ svg_string <- saveXML(svg)
 
 dst <- list(id = "plot_svg", value = svg_string)
 rsquid::named_pipe("NamedPipe", toJSON(dst))
+```
+
+### MemoryMappedFile
+
+```R
+vec <- rsquid::read_memory_mapped_file("mmf")
+
+src <- c(1,2,3,4,5)
+rsquid::write_memory_mapped_file("mmf", as.integer(src))
 ```

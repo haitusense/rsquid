@@ -12,3 +12,5 @@ NULL
 #' @export
 named_pipe <- function(x, y) .Call(wrap__named_pipe, x, y)
 memory_mapped_file <- function(x) .Call(wrap__memory_mapped_file, x)
+read_memory_mapped_file <- function(x) .Call(wrap__read_memory_mapped_file, x)
+write_memory_mapped_file <- function(x, y) .Call(wrap__write_memory_mapped_file, x, y)
