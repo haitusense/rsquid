@@ -5,7 +5,7 @@ use std::io::Write;
 use std::os::windows::ffi::OsStrExt;
 
 #[extendr]
-fn named_pipe(path:&str, message:&str) {
+fn namedPipe(path:&str, message:&str) {
   let path = format!(r##"\\.\pipe\{path}"##);
   let mut pipe = PipeClient::connect(path).unwrap();
 
@@ -66,6 +66,18 @@ impl MemoryMappedFile {
     memory_slice.to_vec()
   }
 
+  fn to_vector<T>(&self) -> Vec<T> where T: Clone {
+    let memory_size = unsafe {
+      std::slice::from_raw_parts_mut(self.view as *mut i32, 1)[0] as usize
+    };
+    println!("memorysize : {memory_size}");
+
+    let memory_slice = unsafe {
+      std::slice::from_raw_parts_mut(self.view.offset(4) as *mut T, memory_size)
+    };
+    memory_slice.to_vec()
+  }
+
   fn from_vec(&self, src: Vec<i32>) {
     let memory_slice = unsafe {
       std::slice::from_raw_parts_mut(self.view as *mut i32, src.len() + 1)
@@ -76,11 +88,25 @@ impl MemoryMappedFile {
     }
   }
 
+  fn from_vector<T>(&self, src: Vec<T>) where T: Clone + Copy {
+    let memory_size = unsafe {
+      std::slice::from_raw_parts_mut(self.view as *mut i32, 1)
+    };
+    memory_size[0] = src.len() as i32;
+    let memory_slice = unsafe {
+      std::slice::from_raw_parts_mut(self.view.offset(4) as *mut T, src.len())
+    };
+
+    for i in 0..src.len() {
+      memory_slice[i] = src[i];
+    }
+  }
+
 }
 
 
 #[extendr]
-fn read_memory_mapped_file(path:&str) -> Vec<i32> {
+fn readMemoryMappedFile(path:&str) -> Vec<i32> {
   let mmf = MemoryMappedFile::open(path).unwrap();
   let dst = mmf.to_vec();
   mmf.close();
@@ -88,13 +114,28 @@ fn read_memory_mapped_file(path:&str) -> Vec<i32> {
 }
 
 #[extendr]
-fn write_memory_mapped_file(path:&str, src:Vec<i32>) {
+fn readMemoryMappedFileFloat(path:&str) -> Vec<f64> {
+  let mmf = MemoryMappedFile::open(path).unwrap();
+  let dst = mmf.to_vector::<f64>();
+  mmf.close();
+  dst
+}
+
+#[extendr]
+fn writeMemoryMappedFile(path:&str, src:Vec<i32>) {
   let mmf = MemoryMappedFile::open(path).unwrap();
   mmf.from_vec(src);
   mmf.close();
 }
 
 #[extendr]
+fn writeMemoryMappedFileFloat(path:&str, src:Vec<f64>) {
+  let mmf = MemoryMappedFile::open(path).unwrap();
+  mmf.from_vector::<f64>(src);
+  mmf.close();
+}
+
+
 fn memory_mapped_file(path:&str) {
   let wide_name: Vec<u16> = std::ffi::OsStr::new(path)
     .encode_wide()
@@ -140,8 +181,9 @@ fn memory_mapped_file(path:&str) {
 
 extendr_module! {
   mod rsquid;
-  fn named_pipe;
-  fn memory_mapped_file;
-  fn read_memory_mapped_file;
-  fn write_memory_mapped_file;
+  fn namedPipe;
+  fn readMemoryMappedFile;
+  fn readMemoryMappedFileFloat;
+  fn writeMemoryMappedFile;
+  fn writeMemoryMappedFileFloat;
 }

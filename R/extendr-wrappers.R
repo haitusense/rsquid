@@ -10,7 +10,8 @@ NULL
 
 #' Return string `"Hello world!"` to R.
 #' @export
-named_pipe <- function(x, y) .Call(wrap__named_pipe, x, y)
-memory_mapped_file <- function(x) .Call(wrap__memory_mapped_file, x)
-read_memory_mapped_file <- function(x) .Call(wrap__read_memory_mapped_file, x)
-write_memory_mapped_file <- function(x, y) .Call(wrap__write_memory_mapped_file, x, y)
+namedPipe <- function(x, y) .Call(wrap__namedPipe, x, y)
+readMemoryMappedFile <- function(x) .Call(wrap__readMemoryMappedFile, x)
+readMemoryMappedFileFloat <- function(x) .Call(wrap__readMemoryMappedFileFloat, x)
+writeMemoryMappedFile <- function(x, y) .Call(wrap__writeMemoryMappedFile, x, y)
+writeMemoryMappedFileFloat <- function(x, y) .Call(wrap__writeMemoryMappedFileFloat, x, y)

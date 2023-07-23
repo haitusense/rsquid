@@ -78,8 +78,11 @@ rsquid::named_pipe("NamedPipe", toJSON(dst))
 ### MemoryMappedFile
 
 ```R
-vec <- rsquid::read_memory_mapped_file("mmf")
+src <- c(1, 2, 3, 4)
+rsquid::writeMemoryMappedFile("mmf", as.integer(a))
+dst <- rsquid::readMemoryMappedFile("mmf")
 
-src <- c(1,2,3,4,5)
-rsquid::write_memory_mapped_file("mmf", as.integer(src))
+src <- c(1.1, 2.4, 3.6, 4.8)
+rsquid::writeMemoryMappedFileFloat("mmf", a)
+dst <-rsquid::readMemoryMappedFileFloat("mmf")
 ```
