@@ -4,13 +4,24 @@ use named_pipe::PipeClient;
 use std::io::Write;
 use std::os::windows::ffi::OsStrExt;
 
+#[allow(non_snake_case)]
 #[extendr]
-fn namedPipe(path:&str, message:&str) {
+fn namedPipe(path: &str, message: Robj) {
   let path = format!(r##"\\.\pipe\{path}"##);
   let mut pipe = PipeClient::connect(path).unwrap();
 
-  let message_bytes = message.as_bytes();
-  pipe.write_all(message_bytes).unwrap();
+  // Option<&'a str>
+  if let Some(n) = message.as_str() {
+    pipe.write_all(n.as_bytes()).unwrap();
+  }
+
+  // Rtype::List
+  if message.rtype() == Rtype::List {
+    let robj = R!("jsonlite::toJSON({{ message }})").unwrap();
+    let json = robj.as_str().unwrap();
+    pipe.write_all(json.as_bytes()).unwrap();
+  }
+
 }
 
 struct MemoryMappedFile {
@@ -104,7 +115,7 @@ impl MemoryMappedFile {
 
 }
 
-
+#[allow(non_snake_case)]
 #[extendr]
 fn readMemoryMappedFile(path:&str) -> Vec<i32> {
   let mmf = MemoryMappedFile::open(path).unwrap();
@@ -113,6 +124,7 @@ fn readMemoryMappedFile(path:&str) -> Vec<i32> {
   dst
 }
 
+#[allow(non_snake_case)]
 #[extendr]
 fn readMemoryMappedFileFloat(path:&str) -> Vec<f64> {
   let mmf = MemoryMappedFile::open(path).unwrap();
@@ -121,6 +133,7 @@ fn readMemoryMappedFileFloat(path:&str) -> Vec<f64> {
   dst
 }
 
+#[allow(non_snake_case)]
 #[extendr]
 fn writeMemoryMappedFile(path:&str, src:Vec<i32>) {
   let mmf = MemoryMappedFile::open(path).unwrap();
@@ -128,6 +141,7 @@ fn writeMemoryMappedFile(path:&str, src:Vec<i32>) {
   mmf.close();
 }
 
+#[allow(non_snake_case)]
 #[extendr]
 fn writeMemoryMappedFileFloat(path:&str, src:Vec<f64>) {
   let mmf = MemoryMappedFile::open(path).unwrap();
@@ -135,7 +149,7 @@ fn writeMemoryMappedFileFloat(path:&str, src:Vec<f64>) {
   mmf.close();
 }
 
-
+#[allow(dead_code)]
 fn memory_mapped_file(path:&str) {
   let wide_name: Vec<u16> = std::ffi::OsStr::new(path)
     .encode_wide()
@@ -179,6 +193,34 @@ fn memory_mapped_file(path:&str) {
   };
 }
 
+
+#[extendr]
+fn ggsave2svg(val: Robj) -> Robj {
+  R!("
+    local({
+      tmp <- tempfile(pattern = 'tmp', tmpdir = tempdir(), fileext = '.svg')
+      args <- {{ val }}
+      args$file <- tmp
+      do.call(ggplot2::ggsave, args)
+      svg <- XML::xmlRoot(XML::xmlInternalTreeParse(tmp))
+      file.remove(tmp)
+      svg
+    })
+  ").unwrap()
+}
+
+#[allow(non_snake_case)]
+#[extendr]
+fn asImageDataFrame(src: Robj, width: i32, height: i32) -> Robj {
+  R!("
+    local({
+      x <- rep(1:{{ width }}, length.out = {{ width }} * {{ height }})
+      y <- rep(1:{{ height }}, each = {{ width }})
+      data.frame(x = x, y = y, value = {{ src }})
+    })
+  ").unwrap()
+}
+
 extendr_module! {
   mod rsquid;
   fn namedPipe;
@@ -186,4 +228,6 @@ extendr_module! {
   fn readMemoryMappedFileFloat;
   fn writeMemoryMappedFile;
   fn writeMemoryMappedFileFloat;
+  fn ggsave2svg;
+  fn asImageDataFrame;
 }

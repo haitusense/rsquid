@@ -4,6 +4,8 @@ Squid Helper Package for R
 
 ## Installation
 
+### install.packages
+
 install from github
 
 ```R
@@ -15,6 +17,14 @@ install from local
 ```R
 R> install.packages("../rsquid/", repos = NULL, type = "source")
 ```
+
+### dependent
+
+- XML
+- ggplot2
+- svglite
+- jsonlite
+
 
 ## Usage
 
@@ -64,6 +74,10 @@ svg_string <- saveXML(svg)
 library(ggplot2)
 library(gridSVG)
 library(XML)
+
+#pdfファイル作成の抑制
+pdf(NULL)
+
 ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
 svg <- grid.export(NULL, indent = F, prefix ="gridsvg")$svg
 svg <- XML::removeAttributes(svg, "width")
