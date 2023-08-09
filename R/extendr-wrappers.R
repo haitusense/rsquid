@@ -17,4 +17,4 @@ writeMemoryMappedFile <- function(x, y) .Call(wrap__writeMemoryMappedFile, x, y)
 writeMemoryMappedFileFloat <- function(x, y) .Call(wrap__writeMemoryMappedFileFloat, x, y)
 
 ggsave2svg <- function(...) .Call(wrap__ggsave2svg, eval(substitute(alist(...))))
-as.image.data.frame <- function(x,y,z) .Call(wrap__asImageDataFrame, x,y,z)
+as.image.data.frame <- function(src,width,height) .Call(wrap__asImageDataFrame, src,width,height)
