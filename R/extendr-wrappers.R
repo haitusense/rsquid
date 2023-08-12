@@ -10,11 +10,16 @@ NULL
 
 #' Return string `"Hello world!"` to R.
 #' @export
-namedPipe <- function(x, y) .Call(wrap__namedPipe, x, y)
-readMemoryMappedFile <- function(x) .Call(wrap__readMemoryMappedFile, x)
-readMemoryMappedFileFloat <- function(x) .Call(wrap__readMemoryMappedFileFloat, x)
-writeMemoryMappedFile <- function(x, y) .Call(wrap__writeMemoryMappedFile, x, y)
-writeMemoryMappedFileFloat <- function(x, y) .Call(wrap__writeMemoryMappedFileFloat, x, y)
+namedPipe <- function(path, value) .Call(wrap__namedPipe, path, value)
+namedPipeAction <- function(path, action, payload) {
+  dst <- jsonlite::toJSON( list(type = jsonlite::unbox(action), payload = payload) )
+  .Call(wrap__namedPipe, path, dst)
+}
+
+readMemoryMappedFile <- function(path) .Call(wrap__readMemoryMappedFile, path)
+readMemoryMappedFileFloat <- function(path) .Call(wrap__readMemoryMappedFileFloat, path)
+writeMemoryMappedFile <- function(path, index) .Call(wrap__writeMemoryMappedFile, path, index)
+writeMemoryMappedFileFloat <- function(path, index) .Call(wrap__writeMemoryMappedFileFloat, path, index)
 
 ggsave2svg <- function(...) .Call(wrap__ggsave2svg, eval(substitute(alist(...))))
-as.image.data.frame <- function(src,width,height) .Call(wrap__asImageDataFrame, src,width,height)
+as.image.data.frame <- function(src, width, height) .Call(wrap__asImageDataFrame, src, width, height)
